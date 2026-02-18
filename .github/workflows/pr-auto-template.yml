@@ -1,0 +1,22 @@
+name: PR Title Template Automation
+on:
+  pull_request:
+    types: [opened, edited]
+
+jobs:
+  update-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for Bug Keyword
+        if: contains(github.event.pull_request.title, 'bug')
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const template = fs.readFileSync('.github/PULL_REQUEST_TEMPLATE/bug_fix.md', 'utf8');
+            github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: template
+            });
